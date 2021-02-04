@@ -19,6 +19,10 @@ import makeIdxState from './makeIdxState';
 const generateDirectFetch = function generateDirectFetch( { actionDefinition, defaultParamsForAction = {}, immutableParamsForAction = {}, toPersist } ) {
   const target = actionDefinition.href;
   return async function(params) {
+    // For GET and HEAD requests - do not include body
+    const reqBody = ['GET', 'HEAD'].includes(actionDefinition.method)
+      ? undefined
+      : JSON.stringify({ ...defaultParamsForAction, ...params, ...immutableParamsForAction });
     return fetch(target, {
       method: actionDefinition.method,
       headers: {
@@ -26,7 +30,7 @@ const generateDirectFetch = function generateDirectFetch( { actionDefinition, de
         'content-type': 'application/json',
         'accept': actionDefinition.accepts || 'application/ion+json',
       },
-      body: JSON.stringify({ ...defaultParamsForAction, ...params, ...immutableParamsForAction })
+      body: reqBody
     })
       .then( response => {
         const respJson = response.json();
