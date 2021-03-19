@@ -27,7 +27,17 @@ const introspect = async function introspect({ domain, interactionHandle, stateH
     },
     body: JSON.stringify(body)
   })
-    .then( response => response.ok ? response.json() : response.json().then( err => Promise.reject(err)) );
+    .then( response => {
+      if (response.ok) {
+        return response.json();
+      }
+      return response.json().then( err => {
+        if (err.version) { // assumed idx response
+          return err; // http errors with idx responses are not rejected
+        }
+        return Promise.reject(err);
+      });
+    });
 };
 
 export default introspect;
