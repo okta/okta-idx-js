@@ -70,7 +70,7 @@ describe('generateIdxAction', () => {
       JSON.stringify( mockIdxResponse ),
       { status: 401, headers: { 'content-type': 'application/json', 'WWW-Authenticate': 'Oktadevicejwt realm="Okta Device"' } }
     )));
-    makeIdxState.mockReturnValue('mock IdxState');
+    makeIdxState.mockReturnValue({'stepUp': true});
     const actionFunction = generateIdxAction(mockIdxResponse.remediation.value[0]);
     return actionFunction()
       .then( result => {
@@ -88,7 +88,7 @@ describe('generateIdxAction', () => {
           },
           method: 'POST'
         });
-        expect( result ).toBe('mock IdxState');
+        expect( result ).toEqual({'stepUp': true});
       });
   });
 
