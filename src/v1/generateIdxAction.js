@@ -38,9 +38,16 @@ const generateDirectFetch = function generateDirectFetch( { actionDefinition, de
           // the response reaches here when Okta Verify is not installed
           // we need to return an idx object so that
           // the SIW can proceed to the next step without showing error
-          return respJson.then(err => Promise.reject(makeIdxState(err, toPersist)) );
+          return respJson.then(err => {
+            let ms = makeIdxState(err, toPersist);
+            // set to true if flow should be continued without showing any errors
+            ms.stepUp = true;
+            return Promise.reject(ms);
+          });
         }
-        return respJson.then(err => Promise.reject(err));
+        return respJson.then(err => {
+          return Promise.reject(makeIdxState(err, toPersist));
+        });
       })
       .then( idxResponse => makeIdxState(idxResponse, toPersist) );
   };
